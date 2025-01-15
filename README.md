@@ -83,6 +83,9 @@ The API is rate-limited to 60 requests per minute per IP address. If you exceed 
 - 429 Too Many Requests: Rate limit exceeded
 - 500 Internal Server Error: Server-side error
 
+## Testing
+- Run go test ./... -v
+
 ## License
 
 MIT License 

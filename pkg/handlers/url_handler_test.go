@@ -1,47 +1,44 @@
-package tests
+package handlers
 
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"acheisuacara.com.br/pkg/handlers"
 	"acheisuacara.com.br/pkg/models"
+	"acheisuacara.com.br/pkg/services"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/mock"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
 )
 
-type MockURLService struct {
-	mock.Mock
-}
-
-func (m *MockURLService) CreateShortURL(url string) (*models.URL, error) {
-	args := m.Called(url)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
+func setupTestDB(t *testing.T) *gorm.DB {
+	db, err := gorm.Open(sqlite.Open(":memory:"), &gorm.Config{})
+	if err != nil {
+		t.Fatalf("failed to connect database: %v", err)
 	}
-	return args.Get(0).(*models.URL), args.Error(1)
-}
 
-func (m *MockURLService) GetLongURL(shortCode string) (*models.URL, error) {
-	args := m.Called(shortCode)
-	if args.Get(0) == nil {
-		return nil, args.Error(1)
+	// Migrate the schema
+	err = db.AutoMigrate(&models.URL{})
+	if err != nil {
+		t.Fatalf("failed to migrate database: %v", err)
 	}
-	return args.Get(0).(*models.URL), args.Error(1)
+
+	return db
 }
 
 func TestCreateShortURL(t *testing.T) {
 	gin.SetMode(gin.TestMode)
+	db := setupTestDB(t)
+	service := services.NewURLService(db)
+	handler := NewURLHandler(service)
 
 	tests := []struct {
 		name           string
 		requestBody    map[string]interface{}
-		setupMock      func(*MockURLService)
 		expectedStatus int
 		expectedBody   map[string]interface{}
 	}{
@@ -49,13 +46,6 @@ func TestCreateShortURL(t *testing.T) {
 			name: "Valid URL",
 			requestBody: map[string]interface{}{
 				"url": "https://www.amazon.com/product/123",
-			},
-			setupMock: func(m *MockURLService) {
-				m.On("CreateShortURL", "https://www.amazon.com/product/123").Return(
-					&models.URL{
-						URL:       "https://www.amazon.com/product/123",
-						ShortCode: "abc123",
-					}, nil)
 			},
 			expectedStatus: http.StatusOK,
 			expectedBody: map[string]interface{}{
@@ -68,10 +58,6 @@ func TestCreateShortURL(t *testing.T) {
 			requestBody: map[string]interface{}{
 				"url": "not-a-url",
 			},
-			setupMock: func(m *MockURLService) {
-				m.On("CreateShortURL", "not-a-url").Return(nil,
-					errors.New("URL inválida ou não suportada"))
-			},
 			expectedStatus: http.StatusBadRequest,
 			expectedBody: map[string]interface{}{
 				"error": "URL inválida ou não suportada",
@@ -81,10 +67,6 @@ func TestCreateShortURL(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockService := new(MockURLService)
-			tt.setupMock(mockService)
-			handler := handlers.NewURLHandler(mockService)
-
 			router := gin.New()
 			router.POST("/api/shorten", handler.CreateShortURL)
 
@@ -99,41 +81,46 @@ func TestCreateShortURL(t *testing.T) {
 
 			var responseBody map[string]interface{}
 			json.Unmarshal(resp.Body.Bytes(), &responseBody)
-			assert.Equal(t, tt.expectedBody, responseBody)
+
+			if tt.expectedStatus == http.StatusOK {
+				assert.NotEmpty(t, responseBody["short_code"])
+				assert.Equal(t, tt.requestBody["url"], responseBody["url"])
+			} else {
+				assert.Equal(t, tt.expectedBody, responseBody)
+			}
 		})
 	}
 }
 
 func TestRedirectToLongURL(t *testing.T) {
 	gin.SetMode(gin.TestMode)
+	db := setupTestDB(t)
+	service := services.NewURLService(db)
+	handler := NewURLHandler(service)
+
+	// Create a test URL
+	testURL := &models.URL{
+		URL:       "https://www.amazon.com/product/123",
+		ShortCode: "abc123",
+		Clicks:    0,
+	}
+	db.Create(testURL)
 
 	tests := []struct {
 		name           string
 		shortCode      string
-		setupMock      func(*MockURLService)
 		expectedStatus int
 		expectedURL    string
 	}{
 		{
-			name:      "Valid Short Code",
-			shortCode: "abc123",
-			setupMock: func(m *MockURLService) {
-				m.On("GetLongURL", "abc123").Return(
-					&models.URL{
-						URL:       "https://www.amazon.com/product/123",
-						ShortCode: "abc123",
-					}, nil)
-			},
+			name:           "Existing Short Code",
+			shortCode:      "abc123",
 			expectedStatus: http.StatusMovedPermanently,
 			expectedURL:    "https://www.amazon.com/product/123",
 		},
 		{
-			name:      "Invalid Short Code",
-			shortCode: "nonexist",
-			setupMock: func(m *MockURLService) {
-				m.On("GetLongURL", "nonexist").Return(nil,
-					errors.New("URL not found"))
-			},
+			name:           "Non-existing Short Code",
+			shortCode:      "nonexist",
 			expectedStatus: http.StatusNotFound,
 			expectedURL:    "",
 		},
@@ -141,10 +128,6 @@ func TestRedirectToLongURL(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockService := new(MockURLService)
-			tt.setupMock(mockService)
-			handler := handlers.NewURLHandler(mockService)
-
 			router := gin.New()
 			router.GET("/:shortCode", handler.RedirectToLongURL)
 

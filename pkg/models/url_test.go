@@ -1,10 +1,8 @@
-package tests
+package models
 
 import (
 	"testing"
 	"time"
-
-	"acheisuacara.com.br/pkg/models"
 )
 
 func TestURLValidation(t *testing.T) {
@@ -42,7 +40,7 @@ func TestURLValidation(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			url := &models.URL{
+			url := &URL{
 				URL:       tt.url,
 				CreatedAt: time.Now(),
 				UpdatedAt: time.Now(),

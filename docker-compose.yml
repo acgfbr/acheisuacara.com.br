@@ -22,25 +22,8 @@ services:
       - .env
     environment:
       - GIN_MODE=release
-      - DB_HOST=mysql
-      - REDIS_HOST=redis
     depends_on:
-      - mysql
       - redis
-    networks:
-      - app-network
-
-  mysql:
-    image: mysql:8.0
-    env_file:
-      - .env
-    environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-      MYSQL_DATABASE: ${DB_NAME}
-    ports:
-      - "${DB_PORT}:3306"
-    volumes:
-      - mysql-data:/var/lib/mysql
     networks:
       - app-network
 
@@ -56,7 +39,6 @@ services:
       - app-network
 
 volumes:
-  mysql-data:
   redis-data:
 
 networks:
