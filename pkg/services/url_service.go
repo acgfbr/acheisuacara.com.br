@@ -24,7 +24,7 @@ func (s *URLService) CreateShortURL(longURL string) (*models.URL, error) {
 	}
 
 	if !url.Validate() {
-		return nil, errors.New("invalid URL or not from a supported marketplace")
+		return nil, errors.New("URL inválida ou não suportada")
 	}
 
 	// Generate short code

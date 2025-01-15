@@ -1,10 +1,14 @@
 import { useState } from 'react';
 import { TextInput, Button, Paper, CopyButton, Text, Stack, Box } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconLink, IconCopy, IconCheck } from '@tabler/icons-react';
+import { FiLink, FiCopy, FiCheck } from 'react-icons/fi';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8080';
+// Pre-configure axios
+const api = axios.create({
+  baseURL: 'http://localhost:8080',
+  timeout: 5000
+});
 
 interface ShortenedURL {
   url: string;
@@ -21,18 +25,18 @@ export default function URLShortenerForm() {
     setLoading(true);
 
     try {
-      const response = await axios.post(`${API_URL}/api/shorten`, { url });
+      const response = await api.post('/api/shorten', { url });
       setShortenedURL(response.data);
       setUrl('');
       notifications.show({
         title: 'Success',
-        message: 'URL shortened successfully!',
+        message: 'URL encurtada com sucesso!',
         color: 'green',
       });
     } catch (error: any) {
       notifications.show({
         title: 'Error',
-        message: error.response?.data?.error || 'Failed to shorten URL',
+        message: error.response?.data?.error || 'Falhou pra encurtar a URL meu capitão',
         color: 'red',
       });
     } finally {
@@ -40,7 +44,7 @@ export default function URLShortenerForm() {
     }
   };
 
-  const shortUrl = shortenedURL ? `${API_URL}/${shortenedURL.short_code}` : '';
+  const shortUrl = shortenedURL ? `${api.defaults.baseURL}/${shortenedURL.short_code}` : '';
 
   return (
     <Stack gap="lg">
@@ -48,12 +52,12 @@ export default function URLShortenerForm() {
         <TextInput
           required
           size="lg"
-          label="Enter marketplace URL"
+          label="Joga aqui o link"
           placeholder="https://www.amazon.com/product/123"
           value={url}
           onChange={(e) => setUrl(e.target.value)}
           mb="md"
-          leftSection={<IconLink size={20} style={{ color: '#1a73e8' }} />}
+          leftSection={<FiLink size={20} style={{ color: '#1a73e8' }} />}
           styles={{
             input: {
               '&:focus': {
@@ -74,7 +78,7 @@ export default function URLShortenerForm() {
             },
           }}
         >
-          Shorten URL
+          Encurtar
         </Button>
       </form>
 
@@ -89,7 +93,7 @@ export default function URLShortenerForm() {
           }}
         >
           <Text size="sm" fw={500} mb="xs" c="dimmed">
-            Shortened URL:
+            URL encurtada:
           </Text>
           <Box
             style={{
@@ -110,13 +114,13 @@ export default function URLShortenerForm() {
               <Button
                 color={copied ? 'teal' : 'blue'}
                 onClick={copy}
-                leftSection={copied ? <IconCheck size={20} /> : <IconCopy size={20} />}
+                leftSection={copied ? <FiCheck size={20} /> : <FiCopy size={20} />}
                 variant={copied ? 'light' : 'filled'}
                 style={{
                   backgroundColor: copied ? undefined : '#1a73e8',
                 }}
               >
-                {copied ? 'Copied!' : 'Copy URL'}
+                {copied ? 'Copiou!' : 'Copiar URL'}
               </Button>
             )}
           </CopyButton>

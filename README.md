@@ -2,6 +2,8 @@
 
 A specialized URL shortener service that only accepts and processes marketplace URLs. Built with Go, MySQL, and Redis.
 
+Production live: acheisuacara.com.br
+
 ## Features
 
 - URL shortening for marketplace links only

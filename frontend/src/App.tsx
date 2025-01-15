@@ -38,7 +38,7 @@ function App() {
             Achei Sua Cara
           </Title>
           <Text c="dimmed" ta="center" mb="xl" size="lg">
-            Shorten your marketplace URLs quickly and easily
+            Encurte suas URLs de marketplace rapidamente!
           </Text>
           <URLShortenerForm />
         </Box>
