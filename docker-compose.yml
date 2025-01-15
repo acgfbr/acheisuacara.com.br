@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   frontend:
     build:
@@ -7,8 +5,6 @@ services:
       dockerfile: Dockerfile
     ports:
       - "80:80"
-    env_file:
-      - .env
     depends_on:
       - backend
     networks:
@@ -18,8 +14,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    env_file:
-      - .env
     environment:
       - GIN_MODE=release
     depends_on:
@@ -29,10 +23,8 @@ services:
 
   redis:
     image: redis:alpine
-    env_file:
-      - .env
     ports:
-      - "${REDIS_PORT}:6379"
+      - "6379:6379"
     volumes:
       - redis-data:/data
     networks:
