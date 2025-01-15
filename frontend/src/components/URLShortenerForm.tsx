@@ -3,10 +3,11 @@ import { TextInput, Button, Paper, CopyButton, Text, Stack, Box } from '@mantine
 import { notifications } from '@mantine/notifications';
 import { FiLink, FiCopy, FiCheck } from 'react-icons/fi';
 import axios from 'axios';
+import { config } from '../config';
 
 // Pre-configure axios
 const api = axios.create({
-  baseURL: 'http://localhost:8080',
+  baseURL: config.apiUrl,
   timeout: 5000
 });
 
@@ -44,7 +45,7 @@ export default function URLShortenerForm() {
     }
   };
 
-  const shortUrl = shortenedURL ? `${api.defaults.baseURL}/${shortenedURL.short_code}` : '';
+  const shortUrl = shortenedURL ? `${config.apiUrl}/${shortenedURL.short_code}` : '';
 
   return (
     <Stack gap="lg">

@@ -44,7 +44,7 @@ func main() {
 
 	// Configure CORS
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:5173"},
+		AllowOrigins:     cfg.CORS.AllowedOrigins,
 		AllowMethods:     []string{"GET", "POST", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type"},
 		ExposeHeaders:    []string{"Content-Length"},
@@ -59,8 +59,9 @@ func main() {
 	router.GET("/:shortCode", urlHandler.RedirectToLongURL)
 
 	// Start server
-	log.Printf("Server starting on port %s", cfg.Server.Port)
-	if err := router.Run(cfg.Server.Port); err != nil {
+	address := fmt.Sprintf("%s%s", cfg.Server.Host, cfg.Server.Port)
+	log.Printf("Server starting on %s", address)
+	if err := router.Run(address); err != nil {
 		log.Fatalf("Failed to start server: %v", err)
 	}
 }

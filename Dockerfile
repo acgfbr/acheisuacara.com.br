@@ -23,9 +23,20 @@ FROM alpine:latest
 
 WORKDIR /app
 
+# Add ca-certificates for HTTPS
+RUN apk --no-cache add ca-certificates
+
 # Copy the binary from builder
 COPY --from=builder /app/main .
-COPY --from=builder /app/config.yaml .
+
+# Create directory for environment file
+RUN mkdir -p /app/config
+
+# Copy environment file if it exists, otherwise use example
+COPY .env* /app/config/
+RUN if [ ! -f /app/config/.env ]; then \
+    cp /app/config/.env.example /app/config/.env; \
+    fi
 
 # Expose port
 EXPOSE 8080

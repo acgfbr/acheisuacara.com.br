@@ -70,11 +70,11 @@ func TestCreateShortURL(t *testing.T) {
 			},
 			setupMock: func(m *MockURLService) {
 				m.On("CreateShortURL", "not-a-url").Return(nil,
-					errors.New("invalid URL or not from a supported marketplace"))
+					errors.New("URL inválida ou não suportada"))
 			},
 			expectedStatus: http.StatusBadRequest,
 			expectedBody: map[string]interface{}{
-				"error": "invalid URL or not from a supported marketplace",
+				"error": "URL inválida ou não suportada",
 			},
 		},
 	}
