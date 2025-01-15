@@ -42,7 +42,7 @@ go mod download
 ```
 
 3. Configure the application:
-- Copy `config.yaml` to the root directory
+- Copy `.env.example` to the root directory and fill with your values
 - Update the configuration values as needed
 
 4. Create the MySQL database:
