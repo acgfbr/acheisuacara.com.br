@@ -15,7 +15,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8091:8080"
+      - "8888:8888"
     environment:
       - GIN_MODE=release
     depends_on:

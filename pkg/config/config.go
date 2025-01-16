@@ -48,7 +48,7 @@ func LoadConfig() (*Config, error) {
 
 	// Server config
 	viper.SetDefault("SERVER_HOST", "0.0.0.0")
-	viper.SetDefault("SERVER_PORT", ":8080")
+	viper.SetDefault("SERVER_PORT", ":8888")
 	viper.SetDefault("RATE_LIMIT", 60)
 	viper.SetDefault("RATE_INTERVAL", 60)
 
