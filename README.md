@@ -55,6 +55,40 @@ CREATE DATABASE acheisuacara;
 go run cmd/api/main.go
 ```
 
+## Testing
+
+The project uses SQLite for testing to avoid requiring a MySQL database during tests. To run the tests:
+
+1. Run all tests:
+```bash
+go test ./... -v
+```
+
+2. Run tests for specific packages:
+```bash
+# Test models
+go test ./pkg/models -v
+
+# Test services
+go test ./pkg/services -v
+
+# Test handlers
+go test ./pkg/handlers -v
+```
+
+3. Run tests with coverage:
+```bash
+go test ./... -v -cover
+```
+
+4. Run tests and generate coverage report:
+```bash
+go test ./... -coverprofile=coverage.out
+go tool cover -html=coverage.out
+```
+
+Note: The "record not found" messages during tests are expected and part of the test cases.
+
 ## API Endpoints
 
 ### Shorten URL
@@ -82,9 +116,6 @@ The API is rate-limited to 60 requests per minute per IP address. If you exceed 
 - 404 Not Found: Short URL not found
 - 429 Too Many Requests: Rate limit exceeded
 - 500 Internal Server Error: Server-side error
-
-## Testing
-- Run go test ./... -v
 
 ## License
 

@@ -10,6 +10,7 @@ import (
 	"acheisuacara.com.br/pkg/models"
 	"acheisuacara.com.br/pkg/services"
 	"github.com/gin-gonic/gin"
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"

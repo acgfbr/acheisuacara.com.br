@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"acheisuacara.com.br/pkg/models"
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
