@@ -39,7 +39,7 @@ RUN if [ ! -f /app/config/.env ]; then \
     fi
 
 # Expose port
-EXPOSE 8888
+EXPOSE 9999
 
 # Run the binary
 CMD ["./main"] 
