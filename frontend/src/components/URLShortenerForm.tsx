@@ -45,7 +45,7 @@ export default function URLShortenerForm() {
     }
   };
 
-  const shortUrl = shortenedURL ? `${config.apiUrl}/${shortenedURL.short_code}` : '';
+  const shortUrl = shortenedURL ? `${config.frontendUrl}/${shortenedURL.short_code}` : '';
 
   return (
     <Stack gap="lg">
