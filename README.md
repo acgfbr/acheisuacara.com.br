@@ -25,7 +25,7 @@ Production live: acheisuacara.com.br
 ## Prerequisites
 
 - Go 1.16 or higher
-- MySQL 5.7 or higher
+- MySQL 8 or higher ( i am using an external mysql xd )
 - Redis 6.0 or higher
 
 ## Installation
